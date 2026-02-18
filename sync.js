@@ -411,3 +411,26 @@ console.log('📁 Firestore DB:', db ? '✅ جاهز' : '❌ مشكلة');
 setTimeout(() => {
     alert('✅ نظام المزامنة جاهز - قاعدة البيانات متصلة');
 }, 2000);
+// إخفاء الرسائل المزعجة
+const originalConsoleLog = console.log;
+console.log = function() {
+    // منع رسايل Firebase المزعجة
+    if (arguments[0] && arguments[0].includes && 
+        (arguments[0].includes('Firebase') || 
+         arguments[0].includes('sync') ||
+         arguments[0].includes('تم حفظ'))) {
+        // لا تفعل شيئاً (اخرس)
+        return;
+    }
+    originalConsoleLog.apply(console, arguments);
+};
+
+// تقليل الإشعارات المرئية
+const originalShowMessage = window.showMessage || function(){};
+window.showMessage = function(text) {
+    // فقط رسائل مهمة جداً
+    if (text.includes('خطأ') || text.includes('مشكلة')) {
+        originalShowMessage(text);
+    }
+    // الباقي يتشال
+};
