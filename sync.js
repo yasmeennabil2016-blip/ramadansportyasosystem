@@ -160,4 +160,7 @@ window.syncFromFirebase = async function() {
 document.addEventListener('DOMContentLoaded', () => {
     createSyncBar();
     console.log('🚀 نظام المزامنة جاهز');
+
 });
+// مزامنة تلقائية كل 30 ثانية
+setInterval(saveToFirebase, 30000);
