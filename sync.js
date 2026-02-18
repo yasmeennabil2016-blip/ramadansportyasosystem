@@ -1,13 +1,14 @@
 // ==================== إعداد Firebase ====================
 const firebaseConfig = {
-  apiKey: "AIzaSyAAFKSdUPEa7U1zpFxc3ZQjqwj9Pji768Q",
+   apiKey: "AIzaSyAAFKSdUPEa7U1zpFxc3ZQjqwj9Pji768Q",
   authDomain: "yasosystem.firebaseapp.com",
+  databaseURL: "https://yasosystem-default-rtdb.firebaseio.com",
   projectId: "yasosystem",
   storageBucket: "yasosystem.firebasestorage.app",
   messagingSenderId: "250096554890",
-  appId: "1:250096554890:web:fac52f0d5912db08b7ee73"
+  appId: "1:250096554890:web:fac52f0d5912db08b7ee73",
+  measurementId: "G-6EH9VH5CKV"
 };
-
 // تهيئة Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -46,3 +47,4 @@ setInterval(() => {
         }
     }, 5000);
 });
+
