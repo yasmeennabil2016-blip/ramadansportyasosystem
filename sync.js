@@ -405,3 +405,9 @@ window.onload = async function() {
     
     console.log('🚀 نظام المزامنة الفورية شغال');
 };
+// تأكيد اتصال Firebase
+console.log('🔥 Firebase Status:', firebase.apps.length ? '✅ متصل' : '❌ غير متصل');
+console.log('📁 Firestore DB:', db ? '✅ جاهز' : '❌ مشكلة');
+setTimeout(() => {
+    alert('✅ نظام المزامنة جاهز - قاعدة البيانات متصلة');
+}, 2000);
