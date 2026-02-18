@@ -1,4 +1,4 @@
-﻿// ==================== إعداد Firebase ====================
+// ==================== إعداد Firebase ====================
 const firebaseConfig = {
   apiKey: "AIzaSyAAFKSdUPEa7U1zpFxc3ZQjqwj9Pji768Q",
   authDomain: "yasosystem.firebaseapp.com",
@@ -12,66 +12,37 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ==================== إيقاف كل الرسائل ====================
-// نخلي console.log فاضي
-console.log = function() {};
-
-// نخلي alert يشتغل فقط للأخطاء الحقيقية
-const originalAlert = window.alert;
-window.alert = function(msg) {
-    if (msg.includes('خطأ') || msg.includes('مشكلة')) {
-        originalAlert(msg);
-    }
-};
-
-// ==================== نظام المزامنة الصامت ====================
-// تحميل البيانات عند بدء التشغيل
-window.onload = async function() {
-    try {
-        // نجرب نحمل البيانات من Firebase
-        const collections = ['trainers', 'registrationRequests', 'questions', 'clients', 'surveys', 'clientAnswers', 'trainerLogos'];
-        
-        for (let collection of collections) {
-            const doc = await db.collection(collection).doc('main').get();
-            if (doc.exists) {
-                localStorage.setItem(collection, JSON.stringify(doc.data().data));
-            }
-        }
-    } catch (e) {
-        // صمت تام
-    }
-};
-
-// حفظ أي تغيير في localStorage إلى Firebase
-const originalSetItem = localStorage.setItem;
-localStorage.setItem = function(key, value) {
-    originalSetItem.call(this, key, value);
+// ==================== نظام المزامنة البسيط ====================
+// كل دقيقة نحمل البيانات من Firebase
+setInterval(() => {
+    const collections = ['trainers', 'registrationRequests', 'questions', 'clients'];
     
-    // حفظ في Firebase (بصمت)
-    try {
-        const data = JSON.parse(value);
-        db.collection(key).doc('main').set({
-            data: data,
-            lastUpdate: new Date().toISOString()
-        }).catch(() => {});
-    } catch (e) {}
-};
-
-// كل دقيقة نجيب آخر التحديثات
-setInterval(async () => {
-    try {
-        const collections = ['trainers', 'registrationRequests', 'questions', 'clients', 'surveys', 'clientAnswers', 'trainerLogos'];
-        
-        for (let collection of collections) {
-            const doc = await db.collection(collection).doc('main').get();
-            if (doc.exists) {
-                const firebaseData = doc.data().data;
-                const localData = localStorage.getItem(collection);
-                
-                if (JSON.stringify(firebaseData) !== localData) {
-                    localStorage.setItem(collection, JSON.stringify(firebaseData));
+    collections.forEach(name => {
+        db.collection(name).doc('main').get()
+            .then(doc => {
+                if (doc.exists) {
+                    localStorage.setItem(name, JSON.stringify(doc.data().data));
                 }
-            }
-        }
-    } catch (e) {}
+            })
+            .catch(() => {});
+    });
 }, 60000);
+
+// كلما يتغير localStorage، نحفظ في Firebase
+['trainers', 'registrationRequests', 'questions', 'clients'].forEach(name => {
+    const original = localStorage.getItem(name);
+    let lastValue = original;
+    
+    setInterval(() => {
+        const current = localStorage.getItem(name);
+        if (current !== lastValue && current) {
+            lastValue = current;
+            try {
+                db.collection(name).doc('main').set({
+                    data: JSON.parse(current),
+                    time: new Date().toISOString()
+                }).catch(() => {});
+            } catch (e) {}
+        }
+    }, 5000);
+});
